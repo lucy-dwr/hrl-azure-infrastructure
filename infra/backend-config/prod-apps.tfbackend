@@ -1,0 +1,4 @@
+resource_group_name  = "rg-hrl-tfstate-prod-wus3"
+storage_account_name = "sthrltfstateprode4sraa"
+container_name       = "tfstate"
+key                  = "prod-apps.tfstate"

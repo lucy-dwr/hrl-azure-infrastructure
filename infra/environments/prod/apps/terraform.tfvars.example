@@ -1,0 +1,7 @@
+subscription_id = "00000000-0000-0000-0000-000000000000"
+location        = "westus3"
+environment     = "prod"
+
+static_web_app_location      = "westus2"
+static_web_app_sku_tier      = "Standard"
+preview_environments_enabled = true

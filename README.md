@@ -6,7 +6,7 @@ This repository contains Azure infrastructure code only. It currently supports t
 
 ## Repository Status
 
-This repository is in early setup. The first implemented component is `infra/bootstrap`, which creates Azure Blob Storage for future Terraform remote state.
+This repository is in early setup. The first implemented component is `infra/bootstrap`, which creates Azure Blob Storage for future Terraform remote state. The first production application component is `infra/environments/prod/apps`, which defines Azure Static Web Apps infrastructure for the public restoration map.
 
 The intended progression is:
 
@@ -34,6 +34,9 @@ infra/
     variables.tf
     versions.tf
     terraform.tfvars.example
+
+  backend-config/
+    prod-apps.tfbackend
 
   environments/
     prod/
@@ -233,6 +236,8 @@ backend "azurerm" {
 }
 ```
 
+Production roots may use committed `.tfbackend` files from `infra/backend-config/` for convenience. These files must contain only non-secret backend settings such as resource group name, storage account name, container name, and state key. Do not put storage keys, access tokens, credentials, or other secrets in backend config files.
+
 ## Production Components
 
 The first production components should be scaffolded under `infra/environments/prod`.
@@ -246,7 +251,7 @@ Suggested implementation order:
    Durable ADLS Gen2 / Blob Storage resources and containers for raw submissions, standardized data, validation reports, metadata/catalog files, schema snapshots, and public exports.
 
 3. `prod/apps`
-   Azure Static Web Apps infrastructure for the production public restoration map.
+   Azure Static Web Apps infrastructure for production applications. This root uses the bootstrap remote state backend with the state key `prod-apps.tfstate`.
 
 4. `prod/pipelines`
    Future ingestion and processing infrastructure.
@@ -313,6 +318,13 @@ Before committing Terraform changes, run:
 ```bash
 terraform -chdir=infra/bootstrap fmt
 terraform -chdir=infra/bootstrap validate
+```
+
+For the production apps root, run:
+
+```bash
+terraform -chdir=infra/environments/prod/apps fmt
+terraform -chdir=infra/environments/prod/apps validate
 ```
 
 If validation fails because Terraform has not been initialized, run:
