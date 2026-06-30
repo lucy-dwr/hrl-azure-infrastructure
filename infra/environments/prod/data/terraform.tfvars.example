@@ -1,0 +1,8 @@
+subscription_id = "00000000-0000-0000-0000-000000000000"
+location        = "westus3"
+environment     = "prod"
+
+storage_account_replication_type = "ZRS"
+public_exports_access_type       = "blob"
+
+allowed_cors_origins = []

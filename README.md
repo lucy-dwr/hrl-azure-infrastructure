@@ -6,7 +6,7 @@ This repository contains Azure infrastructure code only. It currently supports t
 
 ## Repository Status
 
-This repository is in early setup. The first implemented component is `infra/bootstrap`, which creates Azure Blob Storage for future Terraform remote state. The first production application component is `infra/environments/prod/apps`, which defines Azure Static Web Apps infrastructure for the public restoration map.
+This repository is in early setup. The first implemented component is `infra/bootstrap`, which creates Azure Blob Storage for future Terraform remote state. The first production data component is `infra/environments/prod/data`, which defines ADLS Gen2 / Blob Storage infrastructure for HRL data artifacts. The first production application component is `infra/environments/prod/apps`, which defines Azure Static Web Apps infrastructure for the public restoration map.
 
 The intended progression is:
 
@@ -36,6 +36,7 @@ infra/
     terraform.tfvars.example
 
   backend-config/
+    prod-data.tfbackend
     prod-apps.tfbackend
 
   environments/
@@ -145,6 +146,8 @@ prod-apps.tfstate
 
 The `infra/bootstrap` component is special. It creates the Azure storage account and blob container that will hold future remote state. Bootstrap may initially use local state, but state files must never be committed.
 
+Committed backend config files under `infra/backend-config/` contain Azure resource names only. They must not contain credentials, access keys, deployment tokens, SAS tokens, or secrets.
+
 ## Bootstrap
 
 The `infra/bootstrap` component creates:
@@ -237,6 +240,45 @@ backend "azurerm" {
 ```
 
 Production roots may use committed `.tfbackend` files from `infra/backend-config/` for convenience. These files must contain only non-secret backend settings such as resource group name, storage account name, container name, and state key. Do not put storage keys, access tokens, credentials, or other secrets in backend config files.
+
+## Production Data
+
+The `infra/environments/prod/data` component creates the production data resource group, an ADLS Gen2-enabled storage account, and containers for HRL data artifacts:
+
+```text
+raw-submissions
+standardized
+validation-reports
+schema-snapshots
+public-exports
+```
+
+The `public-exports` container is intended for approved browser-readable artifacts such as the restoration map manifest and versioned GeoJSON, GeoPackage, CSV, and validation report files. Private scientific and operational data remains in private containers.
+
+Initialize the component with its remote backend config:
+
+```bash
+terraform -chdir=infra/environments/prod/data init -reconfigure -backend-config=../../../backend-config/prod-data.tfbackend
+```
+
+Format and validate:
+
+```bash
+terraform -chdir=infra/environments/prod/data fmt
+terraform -chdir=infra/environments/prod/data validate
+```
+
+Create a plan:
+
+```bash
+terraform -chdir=infra/environments/prod/data plan -out prod-data.tfplan
+```
+
+Apply only when you are ready to create or update Azure resources:
+
+```bash
+terraform -chdir=infra/environments/prod/data apply prod-data.tfplan
+```
 
 ## Production Components
 
