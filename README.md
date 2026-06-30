@@ -265,7 +265,7 @@ Expected storage paths include:
 ```text
 raw-submissions/
 standardized/
-  spatial/
+  vector/
   tabular/
   raster/
   model-outputs/
