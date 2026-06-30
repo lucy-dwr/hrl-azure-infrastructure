@@ -1,6 +1,6 @@
 # HRL Azure Infrastructure
 
-Terraform-managed Azure infrastructure for Healthy Rivers and Landscapes (HRL) data systems and public applications.
+This repository uses Terraform to provision Azure infrastructure for Healthy Rivers and Landscapes (HRL) data systems and public applications.
 
 This repository contains Azure infrastructure code only. It currently supports the immediate need to deploy production infrastructure for a public restoration map, while leaving room for a larger HRL data system that can manage spatial, tabular, raster, model-output, metadata, and provenance workflows.
 
