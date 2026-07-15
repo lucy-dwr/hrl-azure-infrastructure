@@ -6,7 +6,7 @@ This repository contains Azure infrastructure code only. It currently supports t
 
 ## Repository Status
 
-This repository is in early setup. The first implemented component is `infra/bootstrap`, which creates Azure Blob Storage for future Terraform remote state. The first production data component is `infra/environments/prod/data`, which defines ADLS Gen2 / Blob Storage infrastructure for HRL data artifacts. The first production application component is `infra/environments/prod/apps`, which defines Azure Static Web Apps infrastructure for the public restoration map.
+This repository is in early setup. The first implemented component is `infra/bootstrap`, which creates Azure Blob Storage for future Terraform remote state. The first production data component is `infra/environments/prod/data`, which defines ADLS Gen2 / Blob Storage infrastructure for HRL data artifacts. The first production application component is `infra/environments/prod/apps`, which defines Azure Static Web Apps infrastructure for the public restoration map. The `infra/environments/prod/ai` component defines a Microsoft Foundry (Azure AI Foundry) account, project, and model deployment for LLM inference workloads.
 
 The intended progression is:
 
@@ -38,6 +38,7 @@ infra/
   backend-config/
     prod-data.tfbackend
     prod-apps.tfbackend
+    prod-ai.tfbackend
 
   environments/
     prod/
@@ -45,6 +46,7 @@ infra/
       data/
       pipelines/
       apps/
+      ai/
 
     dev/
       core/
@@ -79,6 +81,7 @@ rg-hrl-core-prod-wus3
 rg-hrl-data-prod-wus3
 rg-hrl-pipelines-prod-wus3
 rg-hrl-apps-prod-wus3
+rg-hrl-ai-prod-wus3
 ```
 
 Use these boundaries consistently:
@@ -98,6 +101,9 @@ rg-hrl-pipelines-prod-wus3
 
 rg-hrl-apps-prod-wus3
   Public and partner-facing applications such as Azure Static Web Apps for the public restoration map.
+
+rg-hrl-ai-prod-wus3
+  LLM inference resources: a Microsoft Foundry (Azure AI Foundry) account, project, and model deployment(s), plus a dedicated Key Vault for related secrets.
 ```
 
 Do not create resource groups per scientific data type such as `spatial`, `tabular`, or `raster`. Data type organization belongs in storage paths, catalogs, metadata, and schemas.
@@ -119,6 +125,7 @@ rg-hrl-core-prod-wus3
 rg-hrl-data-prod-wus3
 rg-hrl-pipelines-prod-wus3
 rg-hrl-apps-prod-wus3
+rg-hrl-ai-prod-wus3
 ```
 
 Apply common tags consistently:
@@ -142,6 +149,7 @@ prod-core.tfstate
 prod-data.tfstate
 prod-pipelines.tfstate
 prod-apps.tfstate
+prod-ai.tfstate
 ```
 
 The `infra/bootstrap` component is special. It creates the Azure storage account and blob container that will hold future remote state. Bootstrap may initially use local state, but state files must never be committed.
@@ -298,6 +306,9 @@ Suggested implementation order:
 4. `prod/pipelines`
    Future ingestion and processing infrastructure.
 
+5. `prod/ai`
+   Microsoft Foundry (Azure AI Foundry) account, project, and model deployment(s) for LLM inference. This root uses the bootstrap remote state backend with the state key `prod-ai.tfstate`. See [`infra/environments/prod/ai/README.md`](infra/environments/prod/ai/README.md) for details.
+
 ## Data Storage Concept
 
 The durable data layer should support multiple scientific data types. Avoid naming infrastructure as if it only serves a single type of data.
@@ -355,18 +366,20 @@ The `.terraform.lock.hcl` file should generally be committed so provider version
 
 ## Pre-Commit Checks
 
-Before committing Terraform changes, run:
+Before committing Terraform changes, run `fmt` and `validate` against every root you touched:
 
 ```bash
 terraform -chdir=infra/bootstrap fmt
 terraform -chdir=infra/bootstrap validate
-```
 
-For the production apps root, run:
+terraform -chdir=infra/environments/prod/data fmt
+terraform -chdir=infra/environments/prod/data validate
 
-```bash
 terraform -chdir=infra/environments/prod/apps fmt
 terraform -chdir=infra/environments/prod/apps validate
+
+terraform -chdir=infra/environments/prod/ai fmt
+terraform -chdir=infra/environments/prod/ai validate
 ```
 
 If validation fails because Terraform has not been initialized, run:

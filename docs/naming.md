@@ -39,6 +39,7 @@ Valid environment values are:
 | `data`       | Durable data storage (ADLS Gen2, storage containers)  |
 | `pipelines`  | Ingestion and processing resources                    |
 | `apps`       | Public and partner-facing applications                |
+| `ai`         | LLM inference resources (Microsoft Foundry / Azure AI Foundry accounts, projects, model deployments) |
 
 ## Resource groups
 
@@ -56,6 +57,7 @@ rg-hrl-core-prod-wus3
 rg-hrl-data-prod-wus3
 rg-hrl-pipelines-prod-wus3
 rg-hrl-apps-prod-wus3
+rg-hrl-ai-prod-wus3
 ```
 
 ## Azure resource names
@@ -121,6 +123,29 @@ kv-hrl-core-prod-wus3
 ```
 
 Key Vault names must be globally unique, 3–24 characters.
+
+### Microsoft Foundry (Azure AI Foundry) account
+
+Pattern:
+
+```
+cog-<program>-<workload>-<environment>-<random>
+```
+
+Example:
+
+```
+cog-hrl-ai-prod-a7f2mq
+```
+
+The account name must be globally unique (it doubles as the custom subdomain), so it appends the same short random suffix pattern used for storage accounts. The account is created as a Cognitive Services account with `kind = "AIServices"` and `project_management_enabled = true`, which is what makes it a Foundry account rather than a single-service Cognitive Services resource.
+
+Foundry projects underneath an account and individual model deployments do not need the random suffix — they only need to be unique within the parent account:
+
+```
+<program>-<workload>-<environment>          # project, e.g. hrl-ai-prod
+<model-catalog-name>                        # deployment, e.g. claude-sonnet-5
+```
 
 ### Log Analytics Workspace
 
@@ -224,12 +249,14 @@ prod-core.tfstate
 prod-data.tfstate
 prod-pipelines.tfstate
 prod-apps.tfstate
+prod-ai.tfstate
 ```
 
 Backend config files in `infra/backend-config/` follow the same pattern with a `.tfbackend` extension:
 
 ```
 prod-apps.tfbackend
+prod-ai.tfbackend
 ```
 
 ## Data storage paths
