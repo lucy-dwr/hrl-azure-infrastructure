@@ -36,6 +36,7 @@ infra/
     terraform.tfvars.example
 
   backend-config/
+    prod-core.tfbackend
     prod-data.tfbackend
     prod-apps.tfbackend
     prod-ai.tfbackend
@@ -295,7 +296,7 @@ The first production components should be scaffolded under `infra/environments/p
 Suggested implementation order:
 
 1. `prod/core`
-   Shared resource group, Log Analytics Workspace, Key Vault, and managed identities if needed.
+   Shared resource group and Log Analytics workspace. Key Vault, managed identities, role assignments, and diagnostic settings are intentionally deferred until HRL has an agreed access model and the permissions to administer it. This root uses the bootstrap remote state backend with the state key `prod-core.tfstate`. See [`infra/environments/prod/core/README.md`](infra/environments/prod/core/README.md) for details.
 
 2. `prod/data`
    Durable ADLS Gen2 / Blob Storage resources and containers for raw submissions, standardized data, validation reports, metadata/catalog files, schema snapshots, and public exports.
