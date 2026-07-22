@@ -5,3 +5,11 @@ environment     = "prod"
 static_web_app_location      = "westus2"
 static_web_app_sku_tier      = "Standard"
 preview_environments_enabled = true
+
+front_door_sku_name = "Standard_AzureFrontDoor"
+front_door_waf_mode = "Prevention"
+
+# Keep false for the initial Azure Front Door endpoint deployment. Set true only
+# when DTS is ready to create the DNS validation and CNAME records.
+custom_domain_enabled  = false
+custom_domain_hostname = "hrl.water.ca.gov"

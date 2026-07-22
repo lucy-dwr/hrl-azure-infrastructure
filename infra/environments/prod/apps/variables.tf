@@ -47,3 +47,37 @@ variable "preview_environments_enabled" {
   type        = bool
   default     = true
 }
+
+variable "front_door_sku_name" {
+  description = "Azure Front Door SKU for the shared public routing layer."
+  type        = string
+  default     = "Standard_AzureFrontDoor"
+
+  validation {
+    condition     = contains(["Standard_AzureFrontDoor", "Premium_AzureFrontDoor"], var.front_door_sku_name)
+    error_message = "Front Door SKU must be Standard_AzureFrontDoor or Premium_AzureFrontDoor."
+  }
+}
+
+variable "front_door_waf_mode" {
+  description = "Mode for the Front Door WAF managed rules."
+  type        = string
+  default     = "Prevention"
+
+  validation {
+    condition     = contains(["Detection", "Prevention"], var.front_door_waf_mode)
+    error_message = "Front Door WAF mode must be Detection or Prevention."
+  }
+}
+
+variable "custom_domain_enabled" {
+  description = "Whether to provision and associate the DTS-managed public custom domain. Keep false until DTS coordination begins."
+  type        = bool
+  default     = false
+}
+
+variable "custom_domain_hostname" {
+  description = "Public hostname that DTS will validate and point at Azure Front Door."
+  type        = string
+  default     = "hrl.water.ca.gov"
+}

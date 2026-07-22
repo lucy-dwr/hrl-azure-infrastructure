@@ -5,8 +5,11 @@ locals {
   region_code   = "wus3"
   app_name_slug = "restoration-map"
 
-  resource_group_name = "rg-${local.project}-${local.workload}-${var.environment}-${local.region_code}"
-  static_web_app_name = "stapp-${local.project}-${local.app_name_slug}-${var.environment}"
+  resource_group_name      = "rg-${local.project}-${local.workload}-${var.environment}-${local.region_code}"
+  static_web_app_name      = "stapp-${local.project}-${local.app_name_slug}-${var.environment}"
+  front_door_profile_name  = "afd-${local.project}-${var.environment}"
+  front_door_endpoint_name = "fde-${local.project}-${var.environment}"
+  front_door_waf_name      = "waf-${local.project}-${var.environment}"
 
   common_tags = {
     project     = "Healthy Rivers and Landscapes"

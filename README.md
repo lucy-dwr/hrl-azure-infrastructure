@@ -6,7 +6,7 @@ This repository contains Azure infrastructure code only. It currently supports t
 
 ## Repository Status
 
-This repository is in early setup. The first implemented component is `infra/bootstrap`, which creates Azure Blob Storage for future Terraform remote state. The first production data component is `infra/environments/prod/data`, which defines ADLS Gen2 / Blob Storage infrastructure for HRL data artifacts. The first production application component is `infra/environments/prod/apps`, which defines Azure Static Web Apps infrastructure for the public restoration map. The `infra/environments/prod/ai` component defines a Microsoft Foundry (Azure AI Foundry) account, project, and model deployment for LLM inference workloads.
+This repository is in early setup. The first implemented component is `infra/bootstrap`, which creates Azure Blob Storage for future Terraform remote state. The first production data component is `infra/environments/prod/data`, which defines ADLS Gen2 / Blob Storage infrastructure for HRL data artifacts. The production application component, `infra/environments/prod/apps`, defines Azure Static Web Apps and Azure Front Door routing/WAF infrastructure for the public restoration map. The `infra/environments/prod/ai` component defines a Microsoft Foundry (Azure AI Foundry) account, project, and model deployment for LLM inference workloads.
 
 The intended progression is:
 
@@ -101,7 +101,7 @@ rg-hrl-pipelines-prod-wus3
   Processing and ingestion resources such as Container Apps jobs, pipeline identities, queues, or batch resources.
 
 rg-hrl-apps-prod-wus3
-  Public and partner-facing applications such as Azure Static Web Apps for the public restoration map.
+  Public and partner-facing applications such as Azure Static Web Apps for the public restoration map and shared Azure Front Door routing/WAF resources.
 
 rg-hrl-ai-prod-wus3
   LLM inference resources: a Microsoft Foundry (Azure AI Foundry) account, project, and model deployment(s), plus a dedicated Key Vault for related secrets.
@@ -302,7 +302,7 @@ Suggested implementation order:
    Durable ADLS Gen2 / Blob Storage resources and containers for raw submissions, standardized data, validation reports, metadata/catalog files, schema snapshots, and public exports.
 
 3. `prod/apps`
-   Azure Static Web Apps infrastructure for production applications. This root uses the bootstrap remote state backend with the state key `prod-apps.tfstate`.
+   Azure Static Web Apps and shared Azure Front Door routing/WAF infrastructure for production applications. This root uses the bootstrap remote state backend with the state key `prod-apps.tfstate`. See [`infra/environments/prod/apps/README.md`](infra/environments/prod/apps/README.md) for routing and DTS custom-domain coordination details.
 
 4. `prod/pipelines`
    Future ingestion and processing infrastructure.
@@ -335,7 +335,7 @@ schema-snapshots/
 This repository is public. Do not commit:
 
 * Secrets
-* Real `.tfvars` files
+* Real `.tfvars` files (in contrast to `tfvars.example` files)
 * Terraform state
 * Terraform plan files
 * Azure credentials
